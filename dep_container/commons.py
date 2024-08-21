@@ -1,12 +1,12 @@
 import logging
 from functools import lru_cache
 from typing import Generator
-from repositories.screenshot_repository import ScreenshotRepository
-from services.crawler import Crawler
 from pymongo import MongoClient
 from pymongo.database import Database
 from pathlib import Path
 from fastapi import Depends
+from repositories.screenshot_repository import ScreenshotRepository
+from services.crawler import Crawler
 
 
 BASE_DIR = Path("screenshots")
@@ -14,7 +14,7 @@ BASE_DIR.mkdir(exist_ok=True)
 
 
 @lru_cache(maxsize=None)
-def get_db_session()-> Generator[Database]:
+def get_db_session()-> Generator[Database, None, None]:
     client = MongoClient("mongodb://localhost:27017")
     db = client['screenshots_db']
     try:
