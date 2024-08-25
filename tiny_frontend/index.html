@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot API Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input, button {
+            padding: 5px;
+            margin-top: 5px;
+        }
+        button {
+            cursor: pointer;
+        }
+        img {
+            max-width: 200px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Screenshot API Tester</h1>
+
+    <div class="container">
+        <h2>Check Server Health</h2>
+        <button onclick="checkServerHealth()">Check /isalive</button>
+        <p id="healthStatus"></p>
+    </div>
+
+    <div class="container">
+        <h2>Start Screenshot Process</h2>
+        <form id="screenshotForm" onsubmit="startScreenshotProcess(event)">
+            <label for="startUrl">Start URL:</label><br>
+            <input type="text" id="startUrl" required><br>
+            <label for="numberOfLinks">Number of Links to Follow:</label><br>
+            <input type="number" id="numberOfLinks" required><br>
+            <button type="submit">Start Process</button>
+        </form>
+        <p id="screenshotProcessStatus"></p>
+    </div>
+
+    <div class="container">
+        <h2>Get Screenshots by Run ID</h2>
+        <form id="getScreenshotsForm" onsubmit="getScreenshots(event)">
+            <label for="runId">Run ID:</label><br>
+            <input type="text" id="runId" required><br>
+            <button type="submit">Get Screenshots</button>
+        </form>
+        <div id="screenshotsContainer"></div>
+    </div>
+
+    <script>
+        const baseUrl = "http://127.0.0.1:8000";
+
+        async function checkServerHealth() {
+            try {
+                const response = await fetch(`${baseUrl}/isalive`);
+                if (response.ok) {
+                    document.getElementById("healthStatus").textContent = "Server is alive!";
+                } else {
+                    document.getElementById("healthStatus").textContent = "Server is down.";
+                }
+            } catch (error) {
+                document.getElementById("healthStatus").textContent = "Error: " + error.message;
+            }
+        }
+
+        async function startScreenshotProcess(event) {
+            event.preventDefault();
+            const startUrl = document.getElementById("startUrl").value;
+            const numberOfLinks = document.getElementById("numberOfLinks").value;
+
+            const data = {
+                start_url: startUrl,
+                number_of_links_to_follow: parseInt(numberOfLinks)
+            };
+
+            try {
+                const response = await fetch(`${baseUrl}/screenshots`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById("screenshotProcessStatus").textContent = `Screenshot process started. Run ID: ${result.run_id}`;
+                } else {
+                    const errorResult = await response.json();
+                    document.getElementById("screenshotProcessStatus").textContent = `Error: ${errorResult.detail}`;
+                }
+            } catch (error) {
+                document.getElementById("screenshotProcessStatus").textContent = "Error: " + error.message;
+            }
+        }
+
+        async function getScreenshots(event) {
+            event.preventDefault();
+            const runId = document.getElementById("runId").value;
+            console.log("Here");
+
+            try {
+                const response = await fetch(`${baseUrl}/screenshots/${runId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    const screenshotsContainer = document.getElementById("screenshotsContainer");
+                    screenshotsContainer.innerHTML = `<h3>Screenshots for Run ID: ${result.run_id}</h3>`;
+                    result.screenshots.forEach(screenshot => {
+                        const img = document.createElement("img");
+                        img.src = `${baseUrl}/${screenshot}`;
+                        screenshotsContainer.appendChild(img);
+                    });
+                } else {
+                    const errorResult = await response.json();
+                    document.getElementById("screenshotsContainer").textContent = `Error: ${errorResult.detail}`;
+                }
+            } catch (error) {
+                document.getElementById("screenshotsContainer").textContent = "Error: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
