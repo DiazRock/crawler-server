@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from logging import Logger
+from pathlib import Path
 from dtos.screenshot import ScreenshotRequest, ScreenshotResponse
 import uuid
 from dep_container import get_crawler_service, get_logger
@@ -54,13 +55,14 @@ async def start_screenshot_process(
     try:
         screenshots = await crawler_service.crawl_website(
                             request.start_url, 
-                            request.number_of_links_to_follow, run_id
+                            request.number_of_links_to_follow, 
+                            run_id
                             )
     except Exception as e:
         logger.error("Error occurred while crawling website", {"exception": e})
         raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                detail="An error occurred while crawling the website")
+                detail=f"An error occurred while crawling the website {e}")
         
     return {"run_id": run_id, "screenshots": screenshots}
 
@@ -95,7 +97,7 @@ async def start_screenshot_process(
                     }
                 }
             )
-async def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_crawler_service)):
+def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_crawler_service)):
     """
         Retrieves all screenshots associated with a given run ID.
     
@@ -116,7 +118,7 @@ async def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_cr
         }
         ```
     """
-    record = await crawler_service.get_screenshots_by_run_id(run_id= run_id)
+    record = crawler_service.get_screenshots_by_run_id(run_id= run_id)
     if not record:
         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND, 
@@ -124,8 +126,6 @@ async def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_cr
                             )
     
     screenshots = record["screenshots"]
-    screenshots_data = [
-        {"filename": screenshot, "url": f"/static/screenshots/{screenshot}"} 
-        for screenshot in screenshots
-        ]
-    return {"screenshots": screenshots_data}
+    return {"run_id": run_id, "screenshots": screenshots}
+
+
