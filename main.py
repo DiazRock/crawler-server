@@ -4,12 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 # Import routers from controllers
 from controllers.health import router as health_router
 from controllers.screenshots import router as screenshots_router
+from controllers.metrics import router as metrics_router
 
+# Import middlewares
+from middlewares.prometheus_middleware import prometheus_middleware
+
+load_dotenv()
 app = FastAPI(
     title="My Screenshot API",
     description="This API allows you to take screenshots of web pages and store them.",
@@ -25,6 +28,8 @@ app = FastAPI(
     }
 )
 
+
+app.middleware("http")(prometheus_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5500"],  # Specify the exact origin here
@@ -32,9 +37,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # Register the routers
 app.include_router(health_router)
 app.include_router(screenshots_router)
+app.include_router(metrics_router)
 
 # Serve static files (e.g., screenshots)
 scsh_path = os.getenv('SCREENSHOT_FOLDER')
