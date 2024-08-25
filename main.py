@@ -1,5 +1,10 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Import routers from controllers
 from controllers.health import router as health_router
@@ -20,9 +25,17 @@ app = FastAPI(
     }
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5500"],  # Specify the exact origin here
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Register the routers
 app.include_router(health_router)
 app.include_router(screenshots_router)
 
 # Serve static files (e.g., screenshots)
-app.mount("/static", StaticFiles(directory="/screenshots"), name="static")
+scsh_path = os.getenv('SCREENSHOT_FOLDER')
+app.mount(f"/{scsh_path}", StaticFiles(directory=scsh_path), name="screenshots_folder")
