@@ -12,9 +12,9 @@
             "args": [
                 "main:app",
                 "--reload",
-                "--host" ,
-                "0.0.0.0", 
-                "--port", 
+                "--host",
+                "0.0.0.0",
+                "--port",
                 "8000"
             ],
             "jinja": true,
@@ -26,6 +26,17 @@
             "request": "launch",
             "program": "${cwd}/dump.py",
             "console": "integratedTerminal",
+        },
+        {
+            "name": "Python Debugger: Pytest",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "env": {
+                "SCREENSHOT_FOLDER": "screenshots_folder_test",
+                "IS_EXPOSE_METRICS": "False"
+            },
+            "justMyCode": true
         }
     ]
 }
