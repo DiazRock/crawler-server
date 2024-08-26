@@ -14,7 +14,7 @@
   - [Introduction](#introduction)
   - [Features](#features)
   - [Installation](#installation)
-    - [Docker](#docker)
+    - [Docker (Highly recommended)](#docker-highly-recommended)
   - [Usage](#usage)
     - [API endpoints](#api-endpoints)
   - [Testing](#testing)
@@ -35,7 +35,7 @@ Screenshot Service is a FastAPI-based web service designed to capture screenshot
 
 ## Installation
 
-### Docker
+### Docker (Highly recommended)
 
 To run the project using Docker, follow these steps:
 
