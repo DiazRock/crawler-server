@@ -5,6 +5,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95.0-green.svg)
 ![Docker](https://img.shields.io/badge/Docker-3.8-blue.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4.4-green.svg)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg)
 
 ## Table of Contents
 
@@ -30,6 +31,7 @@ Screenshot Service is a FastAPI-based web service designed to capture screenshot
 - Unit and integration tests with pytest.
 - Monitoring using Prometheus and Grafana.
 - Dockerized setup for easy deployment.
+- Redis as a cache server for recurrent websites
 
 ## Installation
 
