@@ -13,6 +13,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - SCREENSHOT_FOLDER=screenshots_folder
+      - IS_EXPOSE_METRICS=True
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - mongo
