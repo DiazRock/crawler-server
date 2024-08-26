@@ -6,6 +6,7 @@ pydantic_core==2.14.6
 pymongo==4.8.0
 pyppeteer==2.0.0
 python-dotenv==1.0.1
+redis>=4.2.0rc1
 typing_extensions==4.8.0
 
 ## dev_dependencies
