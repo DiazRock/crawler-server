@@ -18,7 +18,7 @@ class ScreenshotRepository:
         )
 
         # Insert the document into MongoDB
-        self.collection.insert_one(screenshot_doc.model_dump(by_alias=True))        
+        self.collection.insert_one(screenshot_doc.model_dump(by_alias=True))   
 
     def get_screenshots_by_run_id(self, run_id: str):
         return self.collection.find_one({"_id": run_id})
