@@ -1,7 +1,7 @@
 # Screenshot Service
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
+![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95.0-green.svg)
 ![Docker](https://img.shields.io/badge/Docker-3.8-blue.svg)
 ![MongoDB](https://img.shields.io/badge/MongoDB-4.4-green.svg)
