@@ -3,7 +3,7 @@ from logging import Logger
 from pathlib import Path
 from dtos.screenshot import ScreenshotRequest, ScreenshotResponse
 import uuid
-from dep_container import get_crawler_service, get_logger
+from dep_container import get_crawler_service, get_logger, get_cache_client
 from services.crawler import Crawler
 
 router = APIRouter()
@@ -42,7 +42,8 @@ router = APIRouter()
 async def start_screenshot_process(
                                    request: ScreenshotRequest, 
                                    crawler_service: Crawler = Depends(get_crawler_service),
-                                   logger: Logger = Depends(get_logger)
+                                   logger: Logger = Depends(get_logger),
+                                   cache_client = Depends(get_cache_client)
                                    ):
     """
     Starts a task to take screenshots of a webpage and its links.
@@ -58,6 +59,7 @@ async def start_screenshot_process(
                             request.number_of_links_to_follow, 
                             run_id
                             )
+        await cache_client.rpush(run_id, *screenshots)  # Cache for 1 hour
     except Exception as e:
         logger.error("Error occurred while crawling website", {"exception": e})
         raise HTTPException(
@@ -97,7 +99,12 @@ async def start_screenshot_process(
                     }
                 }
             )
-def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_crawler_service)):
+async def get_screenshots(
+                run_id: str, 
+                crawler_service: Crawler = Depends(get_crawler_service),
+                logger: Logger = Depends(get_logger),
+                cache_client = Depends(get_cache_client)
+                ):
     """
         Retrieves all screenshots associated with a given run ID.
     
@@ -118,8 +125,17 @@ def get_screenshots(run_id: str, crawler_service: Crawler = Depends(get_crawler_
         }
         ```
     """
+
+    logger.info("Getting screenshots for run id", extra= {"run_id": run_id})
+    # Retrieve screenshots from cache or database if available
+    cached_data = await cache_client.lrange(run_id, 0, -1)
+    if cached_data:
+        logger.info("Screenshots fetched from cache", extra= {"run_id": run_id})
+        return {"run_id": run_id, "screenshots": cached_data}
+    
     record = crawler_service.get_screenshots_by_run_id(run_id= run_id)
     if not record:
+        logger.error("Screenshots not found in database", extra= {"run_id": run_id})  # Log error for debugging purposes
         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND, 
                             detail="Screenshots not found for the provided ID"
