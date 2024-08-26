@@ -59,7 +59,8 @@ async def start_screenshot_process(
                             request.number_of_links_to_follow, 
                             run_id
                             )
-        await cache_client.rpush(run_id, *screenshots)  # Cache for 1 hour
+        if screenshots:
+            await cache_client.rpush(run_id, *screenshots)  # Cache for 1 hour
     except Exception as e:
         logger.error("Error occurred while crawling website", {"exception": e})
         raise HTTPException(
