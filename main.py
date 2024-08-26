@@ -28,6 +28,11 @@ app = FastAPI(
     }
 )
 
+need_expose_metrics = os.getenv('IS_EXPOSE_METRICS')
+if need_expose_metrics == 'True':
+    app.middleware("http")(prometheus_middleware)
+    app.include_router(metrics_router)
+
 
 app.middleware("http")(prometheus_middleware)
 app.add_middleware(
@@ -38,11 +43,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Register the routers
 app.include_router(health_router)
 app.include_router(screenshots_router)
-app.include_router(metrics_router)
+
 
 # Serve static files (e.g., screenshots)
 scsh_path = os.getenv('SCREENSHOT_FOLDER')
-app.mount(f"/{scsh_path}", StaticFiles(directory=scsh_path), name="screenshots_folder")
+app.mount(f"/{scsh_path}", 
+          StaticFiles(directory=scsh_path), 
+          name=scsh_path)
