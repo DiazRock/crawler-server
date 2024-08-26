@@ -1,11 +1,11 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
 from datetime import datetime
 from pymongo.collection import Collection
 from pymongo.database import Database
 from repositories.screenshot_repository import ScreenshotRepository
 
-@patch('models.screenshot_document.ScreenshotDocument')
+@patch('repositories.screenshot_repository.ScreenshotDocument')
 def test_insert_screenshot_data(MockScreenshotDocument):
     # Arrange
     mock_db = MagicMock(spec=Database)
@@ -14,7 +14,7 @@ def test_insert_screenshot_data(MockScreenshotDocument):
     repository = ScreenshotRepository(db=mock_db)
 
     run_id = "test_run_id"
-    start_url = "https://example.com"
+    start_url = "https://example.com/"
     screenshots = ["screenshot1.png", "screenshot2.png"]
 
     # Mock the ScreenshotDocument instance
@@ -34,7 +34,7 @@ def test_insert_screenshot_data(MockScreenshotDocument):
         _id=run_id,
         start_url=start_url,
         screenshots=screenshots,
-        timestamp=pytest.mock.ANY  # Match any datetime object
+        timestamp=ANY  # Match any datetime object
     )
     mock_collection.insert_one.assert_called_once_with(mock_screenshot_doc.model_dump(by_alias=True))
 

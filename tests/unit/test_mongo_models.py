@@ -45,12 +45,16 @@ def test_screenshot_document_json_encoding():
     obj_id = ObjectId()
 
     # Act
-    document = ScreenshotDocument(id=str(obj_id), start_url=start_url, screenshots=screenshots, timestamp=timestamp)
-    document_dict = document.dict(by_alias=True)
+    document = ScreenshotDocument(
+        _id=str(obj_id),
+        start_url=start_url,
+        screenshots=screenshots,
+        timestamp=timestamp)
+    document_dict = document.model_dump(by_alias=True)
 
     # Assert
     assert document_dict["_id"] == str(obj_id)
-    assert document_dict["timestamp"] == timestamp.isoformat()
+    assert document_dict["timestamp"].isoformat() == timestamp.isoformat()
 
 
 def test_screenshot_document_invalid_screenshots():

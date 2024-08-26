@@ -13,12 +13,12 @@ async def test_crawl_website():
             base_dir=Path("/tmp"), 
             logger=logger_mock)
     
-    start_url = "https://example.com"
+    start_url = "https://example.com/"
     number_of_links = 5
     run_id = "test_run_id"
     
-    with patch("utils.context_managers.BrowserContextManager") as mock_browser_manager, \
-         patch("utils.context_managers.PageContextManager") as mock_page_manager:
+    with patch("services.crawler.BrowserContextManager") as mock_browser_manager, \
+         patch("services.crawler.PageContextManager") as mock_page_manager:
         
         mock_browser = mock_browser_manager.return_value.__aenter__.return_value
         mock_page = mock_page_manager.return_value.__aenter__.return_value
@@ -29,7 +29,9 @@ async def test_crawl_website():
         
         mock_screenshot_paths = [
                     f"/tmp/{run_id}_screenshot_0.png",
-                    f"/tmp/{run_id}_screenshot_1.png"
+                    f"/tmp/{run_id}_screenshot_1.png",
+                    f"/tmp/{run_id}_screenshot_2.png",
+                    f"/tmp/{run_id}_screenshot_3.png"
                     ]
         crawler.take_screenshots = AsyncMock(return_value=mock_screenshot_paths)
 
@@ -106,10 +108,10 @@ async def test_take_screenshot():
     logger_mock = MagicMock()
     crawler = Crawler(repository=repository_mock, base_dir=Path("/tmp"), logger=logger_mock)
 
-    url = "https://example.com"
+    url = "https://example.com/"
     screenshot_path = Path("/tmp/test_screenshot.png")
 
-    with patch("utils.context_managers.PageContextManager") as mock_page_manager:
+    with patch("services.crawler.PageContextManager") as mock_page_manager:
         mock_page = mock_page_manager.return_value.__aenter__.return_value
         
         # Act
